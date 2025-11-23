@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4"
+      main_tree_to_execute="UseElevator">
+  <BehaviorTree ID="ExitAtRightFloor">
+    <AsyncSequence>
+      <ReactiveSequence>
+        <RecheckCurrentFloor curr_floor="curr_floor"/>
+        <IfThenElse _description="Check if current floor is equal to desired floor"
+                    _successIf="curr_floor == desired_floor">
+          <AlwaysSuccess/>
+          <AlwaysFailure/>
+        </IfThenElse>
+      </ReactiveSequence>
+      <SubTree ID="WaitAndEnterExitElevator"/>
+    </AsyncSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="GoPressButtonAndComeBack">
+    <AsyncSequence>
+      <Navigate goal_pos="{panel_pos}"
+                initial_pos="{start_pos}"
+                _description="Go to a given location. Return start location"/>
+      <DetectButtonPos button_text="{bt_text}"
+                       button_pos="{bt_pos}"/>
+      <ManipulateToPose goal_pose="{bt_pos}"/>
+      <PressButton/>
+      <ManipulateToPose goal_pose="{arm_home_pose}"/>
+      <Navigate goal_pos="{start_pos}"
+                initial_pos="{panel_pos}"/>
+    </AsyncSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="UseElevator">
+    <AsyncSequence>
+      <SubTree ID="GoPressButtonAndComeBack"
+               panel_pos="{call_panel_pos}"
+               bt_text="{call_bt_dir}"
+               _autoremap="true"/>
+      <SubTree ID="WaitAndEnterExitElevator"/>
+      <SubTree ID="GoPressButtonAndComeBack"
+               panel_pos="{floor_panel_pos}"
+               bt_text="{floor_num}"
+               _autoremap="true"/>
+      <SubTree ID="ExitAtRightFloor"/>
+    </AsyncSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="WaitAndEnterExitElevator">
+    <AsyncSequence>
+      <Timeout msec="2000">
+        <KeepRunningUntilFailure>
+          <Inverter>
+            <DetectDoorOpen/>
+          </Inverter>
+        </KeepRunningUntilFailure>
+      </Timeout>
+      <Navigate goal_pos="nxt_pos"
+                initial_pos="def_pos"/>
+    </AsyncSequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="DetectButtonPos"
+            editable="true">
+      <input_port name="button_text">Which button to press on a panel</input_port>
+      <output_port name="button_pos">Pose of button detected</output_port>
+    </Action>
+    <Action ID="DetectDoorOpen"
+            editable="true"/>
+    <Action ID="ManipulateToPose"
+            editable="true">
+      <input_port name="goal_pose"/>
+    </Action>
+    <Action ID="Navigate"
+            editable="true">
+      <input_port name="goal_pos">2D position to navigate to</input_port>
+      <output_port name="initial_pos">2D position from where the robot started</output_port>
+    </Action>
+    <Action ID="PressButton"
+            editable="true"/>
+    <Action ID="RecheckCurrentFloor"
+            editable="true">
+      <output_port name="curr_floor">Floor Detected</output_port>
+    </Action>
+  </TreeNodesModel>
+
+</root>

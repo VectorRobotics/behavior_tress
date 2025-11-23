@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4" project_name="Project">
+    <include path="elev_bt.xml"/>
+    <!-- Description of Node Models (used by Groot) -->
+    <TreeNodesModel>
+        <Action ID="CheckDoorOpen" editable="true"/>
+        <Action ID="DetectButtonPos" editable="true">
+            <input_port name="button_text">Which button to press on a panel</input_port>
+            <output_port name="button_pos">Pose of button detected</output_port>
+        </Action>
+        <Action ID="DetectDoorOpen" editable="true"/>
+        <Action ID="ManipulateToPose" editable="true">
+            <input_port name="goal_pose"/>
+        </Action>
+        <Action ID="Navigate" editable="true">
+            <input_port name="goal_pos">2D position to navigate to</input_port>
+            <output_port name="initial_pos">2D position from where the robot started</output_port>
+        </Action>
+        <Action ID="PressButton" editable="true"/>
+        <Action ID="RecheckCurrentFloor" editable="true">
+            <output_port name="curr_floor">Floor Detected</output_port>
+        </Action>
+    </TreeNodesModel>
+</root>
