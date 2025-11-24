@@ -1,32 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root BTCPP_format="4"
-      main_tree_to_execute="UseElevator">
-  <BehaviorTree ID="ExitAtRightFloor">
-    <AsyncSequence>
-      <ReactiveSequence>
-        <RecheckCurrentFloor curr_floor="curr_floor"/>
-        <IfThenElse _description="Check if current floor is equal to desired floor"
-                    _successIf="curr_floor == desired_floor">
-          <AlwaysSuccess/>
+    main_tree_to_execute="UseElevator">
+  <BehaviorTree ID="ApproveEntry">
+    <DetectDoorOpen/>
+  </BehaviorTree>
+
+  <BehaviorTree ID="ApproveExit">
+    <Parallel failure_count="1"
+              success_count="-1">
+      <DetectDoorOpen/>
+      <Sequence>
+        <RecheckCurrentFloor curr_floor="{curr_floor}"/>
+        <IfThenElse _successIf="curr_floor==target_floor"
+                    _failureIf="curr_floor!=target_floor">
           <AlwaysFailure/>
         </IfThenElse>
-      </ReactiveSequence>
-      <SubTree ID="WaitAndEnterExitElevator"/>
-    </AsyncSequence>
+      </Sequence>
+    </Parallel>
   </BehaviorTree>
 
   <BehaviorTree ID="GoPressButtonAndComeBack">
     <AsyncSequence>
-      <Navigate goal_pos="{panel_pos}"
-                initial_pos="{start_pos}"
-                _description="Go to a given location. Return start location"/>
-      <DetectButtonPos button_text="{bt_text}"
-                       button_pos="{bt_pos}"/>
-      <ManipulateToPose goal_pose="{bt_pos}"/>
-      <PressButton/>
-      <ManipulateToPose goal_pose="{arm_home_pose}"/>
-      <Navigate goal_pos="{start_pos}"
-                initial_pos="{panel_pos}"/>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="3">
+          <Navigate goal_pos="{panel_pos}"
+                    initial_pos="{start_pos}"
+                    _description="Go to a given location. Return start location"/>
+        </RetryUntilSuccessful>
+      </Timeout>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="-1">
+          <DetectButtonPos button_text="{bt_text}"
+                           button_pos="{bt_pos}"/>
+        </RetryUntilSuccessful>
+      </Timeout>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="3">
+          <ManipulateToPose goal_pose="{bt_pos}"/>
+        </RetryUntilSuccessful>
+      </Timeout>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="3">
+          <PressButton/>
+        </RetryUntilSuccessful>
+      </Timeout>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="3">
+          <ManipulateToPose goal_pose="{arm_home_pose}"/>
+        </RetryUntilSuccessful>
+      </Timeout>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="3">
+          <Navigate goal_pos="{start_pos}"
+                    initial_pos="{panel_pos}"/>
+        </RetryUntilSuccessful>
+      </Timeout>
     </AsyncSequence>
   </BehaviorTree>
 
@@ -36,38 +64,74 @@
                panel_pos="{call_panel_pos}"
                bt_text="{call_bt_dir}"
                _autoremap="true"/>
-      <SubTree ID="WaitAndEnterExitElevator"/>
+      <SubTree ID="WaitAndEnterElevator"
+               _autoremap="true"/>
       <SubTree ID="GoPressButtonAndComeBack"
                panel_pos="{floor_panel_pos}"
-               bt_text="{floor_num}"
+               bt_text="{target_floor}"
                _autoremap="true"/>
-      <SubTree ID="ExitAtRightFloor"/>
+      <SubTree ID="WaitAndExitElevator"
+               _autoremap="true"/>
     </AsyncSequence>
   </BehaviorTree>
 
-  <BehaviorTree ID="WaitAndEnterExitElevator">
+  <BehaviorTree ID="WaitAndEnterElevator">
     <AsyncSequence>
-      <Timeout msec="2000">
-        <KeepRunningUntilFailure>
-          <Inverter>
-            <DetectDoorOpen/>
-          </Inverter>
-        </KeepRunningUntilFailure>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="-1">
+          <SubTree ID="ApproveEntry" _autoremap="true"/>
+        </RetryUntilSuccessful>
       </Timeout>
-      <Navigate goal_pos="nxt_pos"
-                initial_pos="def_pos"/>
+      <RetryUntilSuccessful num_attempts="3">
+        <Fallback>
+          <Navigate goal_pos="{floor_panel_pos}"
+                    initial_pos="{elevator_entry_pos}"/>
+          <Inverter>
+            <Timeout msec="1000000000">
+              <RetryUntilSuccessful num_attempts="-1">
+                <SubTree ID="ApproveEntry" _autoremap="true"/>
+              </RetryUntilSuccessful>
+            </Timeout>
+          </Inverter>
+        </Fallback>
+      </RetryUntilSuccessful>
+      <RecheckCurrentFloor curr_floor="{entry_floor}"/>
+    </AsyncSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="WaitAndExitElevator">
+    <AsyncSequence>
+      <Timeout msec="1000000000">
+        <RetryUntilSuccessful num_attempts="-1">
+          <SubTree ID="ApproveExit" _autoremap="true"/>
+        </RetryUntilSuccessful>
+      </Timeout>
+      <RetryUntilSuccessful num_attempts="3">
+        <Fallback>
+          <Navigate goal_pos="{elevator_exit_pos}"
+                    initial_pos="{elev_exit_pos}"/>
+          <Inverter>
+            <Timeout msec="1000000000">
+              <RetryUntilSuccessful num_attempts="-1">
+                <SubTree ID="ApproveExit" _autoremap="true"/>
+              </RetryUntilSuccessful>
+            </Timeout>
+          </Inverter>
+        </Fallback>
+      </RetryUntilSuccessful>
+      <RecheckCurrentFloor curr_floor="{exit_floor}"/>
     </AsyncSequence>
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="DetectDoorOpen"
+            editable="true"/>
     <Action ID="DetectButtonPos"
             editable="true">
       <input_port name="button_text">Which button to press on a panel</input_port>
       <output_port name="button_pos">Pose of button detected</output_port>
     </Action>
-    <Action ID="DetectDoorOpen"
-            editable="true"/>
     <Action ID="ManipulateToPose"
             editable="true">
       <input_port name="goal_pose"/>

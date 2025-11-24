@@ -8,7 +8,6 @@
             <input_port name="button_text">Which button to press on a panel</input_port>
             <output_port name="button_pos">Pose of button detected</output_port>
         </Action>
-        <Action ID="DetectDoorOpen" editable="true"/>
         <Action ID="ManipulateToPose" editable="true">
             <input_port name="goal_pose"/>
         </Action>
