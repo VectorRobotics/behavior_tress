@@ -43,6 +43,17 @@ Run
 ```bash
 ./build/humanoid_bt/test_bt 
 ```
+All nodes in the test BT run async. You can inject Success (s), Running (r) or Failure (f) states in the node currently running.
 
 ## Running with ROS2 🚧
 TODO
+
+# Development
+## Using Groot2 (GUI)
+Behavior Trees can be very intutively developed using [Groot2](https://www.behaviortree.dev/groot). Download the application from their [website](https://www.behaviortree.dev/groot). 
+
+Open the `.btproj` file in trees folder. Groot2 can directly export the `.xml` file. Learn more [here](https://www.behaviortree.dev/docs/tutorial-basics/tutorial_11_groot2).
+
+# Available Trees
+## `elev_bt.xml`
+![](trees/elev_bt.png )
