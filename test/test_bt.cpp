@@ -1,7 +1,7 @@
-#include "behaviortree_cpp/bt_factory.h"
+#include <behaviortree_cpp/bt_factory.h>
 
 // file that contains the custom nodes definitions
-#include "nodes.h"
+#include <humanoid_bt_tests/nodes.h>
 using namespace BT;
 
 int main()

@@ -1,5 +1,5 @@
-# include "nodes.h"
-#include "behaviortree_cpp/action_node.h"
+#include <humanoid_bt_tests/nodes.h>
+#include <behaviortree_cpp/action_node.h>
 using namespace BT;
 
 NodeStatus Test::onStart() {
