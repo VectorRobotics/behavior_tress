@@ -1,6 +1,6 @@
 #include "humanoid_bt/nav_bt_runner.h"
 #include <rclcpp/rclcpp.hpp>
-#include <behaviortree_ros2/bt_node.hpp>
+#include <behaviortree_ros2/ros_node_params.hpp>
 #include <behaviortree_cpp/bt_factory.h>
 
 using namespace humanoid_bt;
@@ -19,14 +19,11 @@ void BTRunner::run()
   BT::RosNodeParams params;
   params.nh = node;
 
-  BT::RosNodeFactory ros_factory(params);
-  ros_factory.registerRosNodes(factory);
-
   auto tree = factory.createTreeFromFile(tree_file_);
 
   rclcpp::Rate rate(10);
   while (rclcpp::ok()) {
-    tree.tickRoot();
+    tree.tickOnce();
     rclcpp::spin_some(node);
     rate.sleep();
   }

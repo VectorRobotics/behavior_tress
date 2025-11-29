@@ -1,8 +1,8 @@
+‼️ The repository is currently under development 🚧.‼️
+
 This repository contains behavior trees for executing:
 1. Generalist humanoid navigation
 2. Robotic elevator riding
-
-‼️ The repository is currently under development 🚧.‼️
 
 # Introduction
 [Behavior Trees](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)) allow implementing complex task logic in an intuitive and interactable environment. They are extensively used in robotics.
@@ -19,17 +19,30 @@ BehaviorTree.CPP is C++ library for developing and integrating BTs. Architecture
 BehaviorTree.CPP is frequently used in robotics and in the ROS ecosystem. BehaviorTree.ROS2 is a ready-to-use set of wrappers, which can be used to quickly implement TreeNodes that interact with ROS2.
 
 # Installation
-🚧
-## Repository Structure
-The repository can be cloned as a ROS2 Jazzy package 🚧 and also includes scripts to test BTs outside the ROS environment.
+
+The repository can be cloned as a ROS2 Jazzy package and also includes scripts to test BTs outside the ROS environment.
 
 ## Steps
 1. Clone this repo in the `src` directory of your workspace.
     ``` bash
     git clone https://github.com/VectorRobotics/humanoid_bt.git
     ```
-2. Build
+2. Clone the BehaviorTree.ROS2 repo in the `src` directory of your workspace.
+    ``` bash
+    git clone https://github.com/BehaviorTree/BehaviorTree.ROS2.git
+    ```
+3. Build
     ```
     cd ..
-    colcon builld --packages-select humanoid_bt
+    colcon build
+    source install/setup.bash
     ```
+
+## Testing
+Run
+```bash
+./build/humanoid_bt/test_bt 
+```
+
+## Running with ROS2 🚧
+TODO

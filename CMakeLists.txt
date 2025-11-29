@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 project(humanoid_bt)
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_gtest REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 
 include_directories(
     include
@@ -30,10 +32,12 @@ install(DIRECTORY trees/
   DESTINATION share/${PROJECT_NAME}/trees)
 
 # Tests using pure BehaviorTree.CPP
-ament_add_gtest(test_bt test/test_bt.cpp)
+ament_add_gtest(test_bt test/test_bt.cpp test/nodes.cpp)
 if(TARGET test_bt)
   target_link_libraries(test_bt behaviortree_cpp::behaviortree_cpp)
 endif()
+ament_target_dependencies(test_bt ament_index_cpp)
+
 
 install(DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch

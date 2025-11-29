@@ -1,4 +1,5 @@
 #include <behaviortree_cpp/bt_factory.h>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 // file that contains the custom nodes definitions
 #include <humanoid_bt_tests/nodes.h>
@@ -33,7 +34,10 @@ int main()
     
   // IMPORTANT: when the object "tree" goes out of scope, all the 
   // TreeNodes are destroyed
-  auto tree = factory.createTreeFromFile("./elev_bt.xml", maintree_bb);
+  std::string pkg_share = ament_index_cpp::get_package_share_directory("humanoid_bt");
+  std::string tree_path = pkg_share + "/trees/elev_bt.xml";
+
+  auto tree = factory.createTreeFromFile(tree_path, maintree_bb);
   // Groot2Publisher publisher(tree);
   // To "execute" a Tree you need to "tick" it.
   // The tick is propagated to the children based on the logic of the tree.
