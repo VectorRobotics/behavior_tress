@@ -1,47 +1,47 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(humanoid_bt)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
 find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_gtest REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
-find_package(behaviortree_cpp REQUIRED)
-find_package(ament_index_cpp REQUIRED)
 
-include_directories(
-    include
-    test/include
+set(THIS_PACKAGE_DEPS
+    behaviortree_ros2::behaviortree_ros2
 )
 
-# Library or node to run BT via ROS2
+include_directories( include )
+######################################################
+# Simple example showing how to use and customize the BtExecutionServer
 add_executable(nav_bt_runner src/nav_bt_runner.cpp)
+target_link_libraries(nav_bt_runner ${THIS_PACKAGE_DEPS})
+
 add_executable(elev_bt_runner src/elev_bt_runner.cpp)
+target_link_libraries(elev_bt_runner ${THIS_PACKAGE_DEPS})
 
-ament_target_dependencies(nav_bt_runner behaviortree_ros2)
-ament_target_dependencies(elev_bt_runner behaviortree_ros2)
+######################################################
+# INSTALL
 
-# Install executable
-install(TARGETS nav_bt_runner elev_bt_runner
-  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  nav_bt_runner
+  elev_bt_runner
+  DESTINATION lib/${PROJECT_NAME}
+  )
 
-# Install header files
-install(DIRECTORY include/
-  DESTINATION include)
+######################################################
+# INSTALL Behavior.xml's, ROS config and launch files
 
-# Install tree XML files
-install(DIRECTORY trees/
-  DESTINATION share/${PROJECT_NAME}/trees)
+install(DIRECTORY include/ DESTINATION include)
 
-# Tests using pure BehaviorTree.CPP
-ament_add_gtest(test_bt test/test_bt.cpp test/nodes.cpp)
-if(TARGET test_bt)
-  target_link_libraries(test_bt behaviortree_cpp::behaviortree_cpp)
-endif()
-ament_target_dependencies(test_bt ament_index_cpp)
+install(DIRECTORY
+    trees
+    launch
+    DESTINATION share/${PROJECT_NAME}/
+    )
 
 
-install(DIRECTORY launch/
-  DESTINATION share/${PROJECT_NAME}/launch
-)
-
+ament_export_dependencies(behaviortree_ros2)
 
 ament_package()

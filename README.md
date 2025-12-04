@@ -34,6 +34,9 @@ The repository can be cloned as a ROS2 Jazzy package and also includes scripts t
 3. Build
     ```
     cd ..
+    sudo apt update
+    rosdep update
+    rosdep install --from-path src -i
     colcon build
     source install/setup.bash
     ```
